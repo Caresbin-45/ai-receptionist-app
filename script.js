@@ -88,6 +88,15 @@ const intents = {
 };
 
 /**
+ * Escapes special regex characters in a pattern string
+ * @param {string} pattern - Pattern to escape
+ * @returns {string} - Escaped pattern
+ */
+function escapeRegexPattern(pattern) {
+    return pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Analyzes user input and determines the intent
  * @param {string} input - User's message
  * @returns {string} - Detected intent or 'unknown'
@@ -97,7 +106,10 @@ function detectIntent(input) {
     
     for (const [intent, data] of Object.entries(intents)) {
         for (const pattern of data.patterns) {
-            if (normalizedInput.includes(pattern)) {
+            // Use word boundary matching to avoid false positives
+            const escapedPattern = escapeRegexPattern(pattern);
+            const regex = new RegExp('\\b' + escapedPattern + '\\b');
+            if (regex.test(normalizedInput)) {
                 return intent;
             }
         }
@@ -306,11 +318,12 @@ function validateAppointmentForm(formData) {
     
     // Date validation
     const selectedDate = new Date(formData.date);
+    selectedDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     if (!formData.date || selectedDate < today) {
-        errors.push('Please select a valid future date');
+        errors.push('Please select a valid date (today or later)');
     }
     
     // Time validation
@@ -353,6 +366,41 @@ function saveAppointment(appointmentData) {
 }
 
 /**
+ * Displays validation errors in the form
+ * @param {Array} errors - Array of error messages
+ */
+function displayFormErrors(errors) {
+    // Remove any existing error display
+    const existingErrorDiv = document.getElementById('form-errors');
+    if (existingErrorDiv) {
+        existingErrorDiv.remove();
+    }
+    
+    // Create error display
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'form-errors';
+    errorDiv.style.cssText = 'background: #f44336; color: white; padding: 12px; border-radius: 8px; margin-bottom: 16px;';
+    
+    const errorList = document.createElement('ul');
+    errorList.style.cssText = 'margin: 0; padding-left: 20px;';
+    
+    errors.forEach(error => {
+        const li = document.createElement('li');
+        li.textContent = error;
+        errorList.appendChild(li);
+    });
+    
+    errorDiv.appendChild(errorList);
+    
+    // Insert at the top of the form
+    const form = document.getElementById('appointmentForm');
+    form.insertBefore(errorDiv, form.firstChild);
+    
+    // Scroll to the error
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/**
  * Handles appointment form submission
  * @param {Event} e - Form submit event
  */
@@ -372,8 +420,8 @@ async function handleAppointmentSubmit(e) {
     const validation = validateAppointmentForm(formData);
     
     if (!validation.isValid) {
-        // Show validation errors
-        alert('Please correct the following errors:\n\n' + validation.errors.join('\n'));
+        // Display validation errors inline
+        displayFormErrors(validation.errors);
         return;
     }
     
