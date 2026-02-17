@@ -43,7 +43,12 @@ class AIReceptionist {
   analyzeMessage(message) {
     const lowerMessage = message.toLowerCase();
     
-    // Check for problem/complaint first (higher priority)
+    // Check for thanks first (highest priority for gratitude)
+    if (this.isThanks(lowerMessage)) {
+      return { type: 'thanks', confidence: 0.9 };
+    }
+    
+    // Check for problem/complaint
     if (this.isProblemReport(lowerMessage)) {
       return { type: 'problem', confidence: 0.85 };
     }
@@ -56,11 +61,6 @@ class AIReceptionist {
     // Check for preference-related queries
     if (this.isPreferenceQuery(lowerMessage)) {
       return { type: 'preference', confidence: 0.85 };
-    }
-    
-    // Check for thanks
-    if (this.isThanks(lowerMessage)) {
-      return { type: 'thanks', confidence: 0.9 };
     }
     
     // Check for greeting
