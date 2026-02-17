@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Caresbin-45/ai-receptionist-app#readme",
   "dependencies": {
     "body-parser": "^2.2.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1"
   }
 }

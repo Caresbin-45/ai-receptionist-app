@@ -1,11 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rate limiting middleware to prevent abuse
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
 // Middleware
+app.use(limiter);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -14,6 +23,8 @@ app.use(express.static('public'));
 const userPreferences = new Map();
 const orders = [];
 const problems = [];
+let orderIdCounter = 1;
+let problemIdCounter = 1;
 
 // AI Receptionist class
 class AIReceptionist {
@@ -285,7 +296,7 @@ app.post('/api/orders', (req, res) => {
   }
   
   const order = {
-    id: orders.length + 1,
+    id: orderIdCounter++,
     userId,
     description,
     details,
@@ -320,7 +331,7 @@ app.post('/api/problems', (req, res) => {
   }
   
   const problem = {
-    id: problems.length + 1,
+    id: problemIdCounter++,
     userId,
     description,
     priority,

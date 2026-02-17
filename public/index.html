@@ -248,10 +248,10 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('chat')">💬 Chat</button>
-            <button class="tab" onclick="switchTab('preferences')">⚙️ Preferences</button>
-            <button class="tab" onclick="switchTab('orders')">📦 Orders</button>
-            <button class="tab" onclick="switchTab('problems')">🔧 Problems</button>
+            <button class="tab active" onclick="switchTab('chat', event)">💬 Chat</button>
+            <button class="tab" onclick="switchTab('preferences', event)">⚙️ Preferences</button>
+            <button class="tab" onclick="switchTab('orders', event)">📦 Orders</button>
+            <button class="tab" onclick="switchTab('problems', event)">🔧 Problems</button>
         </div>
 
         <div id="chat-tab" class="tab-content active">
@@ -293,7 +293,7 @@
     </div>
 
     <script>
-        const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+        const userId = 'user-' + Math.random().toString(36).substring(2, 11);
         let currentTab = 'chat';
 
         // Initialize with greeting
@@ -301,7 +301,7 @@
             await sendMessage('Hello', true);
         });
 
-        function switchTab(tabName) {
+        function switchTab(tabName, event) {
             currentTab = tabName;
             
             // Update tab buttons
