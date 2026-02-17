@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Receptionist - Smart Front Desk Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <h1>AI Receptionist</h1>
+            </div>
+            <p class="tagline">Your Smart Front Desk Assistant</p>
+        </header>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <!-- Messages Display Area -->
+            <div class="messages" id="messages">
+                <!-- Welcome message will be added by JavaScript -->
+            </div>
+
+            <!-- Appointment Form (Initially Hidden) -->
+            <div class="appointment-form-container" id="appointmentFormContainer" style="display: none;">
+                <div class="appointment-form">
+                    <h3>Book Your Appointment</h3>
+                    <form id="appointmentForm">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Preferred Date *</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Preferred Time *</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reason">Reason for Visit *</label>
+                            <textarea id="reason" name="reason" required placeholder="Please describe the reason for your visit" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Submit Appointment</button>
+                            <button type="button" class="btn btn-secondary" id="cancelForm">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    class="input-field" 
+                    placeholder="Type your message here..."
+                    autocomplete="off"
+                >
+                <button id="sendButton" class="send-button">
+                    <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
