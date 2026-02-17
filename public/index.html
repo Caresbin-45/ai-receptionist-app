@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Receptionist - Virtual Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message-role {
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .suggestion-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .input-container {
+            padding: 25px 30px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+        }
+
+        #sendBtn {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendBtn:active {
+            transform: translateY(0);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid #667eea;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Receptionist</h1>
+            <p>Your intelligent virtual assistant for preferences, orders, and support</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('chat')">💬 Chat</button>
+            <button class="tab" onclick="switchTab('preferences')">⚙️ Preferences</button>
+            <button class="tab" onclick="switchTab('orders')">📦 Orders</button>
+            <button class="tab" onclick="switchTab('problems')">🔧 Problems</button>
+        </div>
+
+        <div id="chat-tab" class="tab-content active">
+            <div class="chat-container" id="chatContainer">
+                <!-- Messages will be added here -->
+            </div>
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Type your message here..." 
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div id="preferences-tab" class="tab-content">
+            <div class="info-section">
+                <h3>Your Preferences</h3>
+                <div id="preferencesList"></div>
+                <button class="suggestion-btn" onclick="showPreferenceForm()">Add Preference</button>
+            </div>
+        </div>
+
+        <div id="orders-tab" class="tab-content">
+            <div class="info-section">
+                <h3>Your Orders</h3>
+                <div id="ordersList"></div>
+            </div>
+        </div>
+
+        <div id="problems-tab" class="tab-content">
+            <div class="info-section">
+                <h3>Reported Problems</h3>
+                <div id="problemsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+        let currentTab = 'chat';
+
+        // Initialize with greeting
+        window.addEventListener('load', async () => {
+            await sendMessage('Hello', true);
+        });
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Load data for the tab
+            if (tabName === 'preferences') {
+                loadPreferences();
+            } else if (tabName === 'orders') {
+                loadOrders();
+            } else if (tabName === 'problems') {
+                loadProblems();
+            }
+        }
+
+        async function sendMessage(message = null, isAutomatic = false) {
+            const input = document.getElementById('userInput');
+            const text = message || input.value.trim();
+            
+            if (!text) return;
+
+            if (!isAutomatic) {
+                input.value = '';
+            }
+
+            // Add user message to chat
+            if (!isAutomatic) {
+                addMessage('user', text);
+            }
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: text, userId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addMessage('assistant', data.response, data.suggestions);
+                    
+                    // Auto-save preferences if mentioned
+                    if (data.analysis.type === 'preference' && text.toLowerCase().includes('prefer')) {
+                        extractAndSavePreference(text);
+                    }
+                    
+                    // Auto-save order if mentioned
+                    if (data.analysis.type === 'order' && (text.toLowerCase().includes('order') || text.toLowerCase().includes('book'))) {
+                        extractAndSaveOrder(text);
+                    }
+                    
+                    // Auto-save problem if mentioned
+                    if (data.analysis.type === 'problem') {
+                        extractAndSaveProblem(text);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('assistant', 'I apologize, but I encountered an error. Please try again.');
+            }
+        }
+
+        function addMessage(role, content, suggestions = []) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const roleLabel = document.createElement('div');
+            roleLabel.className = 'message-role';
+            roleLabel.textContent = role === 'user' ? 'You' : 'AI Receptionist';
+
+            const textContent = document.createElement('div');
+            textContent.textContent = content;
+
+            messageContent.appendChild(roleLabel);
+            messageContent.appendChild(textContent);
+
+            if (suggestions && suggestions.length > 0) {
+                const suggestionsDiv = document.createElement('div');
+                suggestionsDiv.className = 'suggestions';
+
+                suggestions.forEach(suggestion => {
+                    const btn = document.createElement('button');
+                    btn.className = 'suggestion-btn';
+                    btn.textContent = suggestion;
+                    btn.onclick = () => {
+                        document.getElementById('userInput').value = suggestion;
+                        sendMessage();
+                    };
+                    suggestionsDiv.appendChild(btn);
+                });
+
+                messageContent.appendChild(suggestionsDiv);
+            }
+
+            messageDiv.appendChild(messageContent);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function extractAndSavePreference(text) {
+            // Simple extraction of preferences from text
+            const preferences = {};
+            
+            if (text.toLowerCase().includes('morning')) {
+                preferences.appointmentTime = 'morning';
+            } else if (text.toLowerCase().includes('afternoon')) {
+                preferences.appointmentTime = 'afternoon';
+            } else if (text.toLowerCase().includes('evening')) {
+                preferences.appointmentTime = 'evening';
+            }
+            
+            // Extract color preferences
+            const colors = ['blue', 'red', 'green', 'yellow', 'purple', 'black', 'white'];
+            colors.forEach(color => {
+                if (text.toLowerCase().includes(color)) {
+                    preferences.favoriteColor = color;
+                }
+            });
+
+            if (Object.keys(preferences).length > 0) {
+                await savePreference(preferences);
+            }
+        }
+
+        async function savePreference(preferences) {
+            try {
+                const response = await fetch('/api/preferences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, preferences })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Preferences saved:', data.preferences);
+                }
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+            }
+        }
+
+        async function extractAndSaveOrder(text) {
+            const order = {
+                description: text,
+                details: {}
+            };
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, ...order })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Order saved:', data.order);
+                }
+            } catch (error) {
+                console.error('Error saving order:', error);
+            }
+        }
+
+        async function extractAndSaveProblem(text) {
+            const problem = {
+                description: text,
+                priority: 'normal'
+            };
+
+            try {
+                const response = await fetch('/api/problems', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, ...problem })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Problem saved:', data.problem);
+                }
+            } catch (error) {
+                console.error('Error saving problem:', error);
+            }
+        }
+
+        async function loadPreferences() {
+            try {
+                const response = await fetch(`/api/preferences/${userId}`);
+                const data = await response.json();
+
+                const list = document.getElementById('preferencesList');
+                if (data.preferences && Object.keys(data.preferences).length > 0) {
+                    list.innerHTML = Object.entries(data.preferences)
+                        .map(([key, value]) => `
+                            <div class="info-item">
+                                <strong>${key}:</strong> ${value}
+                            </div>
+                        `).join('');
+                } else {
+                    list.innerHTML = '<p>No preferences saved yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch(`/api/orders/${userId}`);
+                const data = await response.json();
+
+                const list = document.getElementById('ordersList');
+                if (data.orders && data.orders.length > 0) {
+                    list.innerHTML = data.orders
+                        .map(order => `
+                            <div class="info-item">
+                                <strong>Order #${order.id}</strong><br>
+                                ${order.description}<br>
+                                <small>Status: ${order.status} | ${new Date(order.createdAt).toLocaleString()}</small>
+                            </div>
+                        `).join('');
+                } else {
+                    list.innerHTML = '<p>No orders yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        async function loadProblems() {
+            try {
+                const response = await fetch(`/api/problems/${userId}`);
+                const data = await response.json();
+
+                const list = document.getElementById('problemsList');
+                if (data.problems && data.problems.length > 0) {
+                    list.innerHTML = data.problems
+                        .map(problem => `
+                            <div class="info-item">
+                                <strong>Problem #${problem.id}</strong><br>
+                                ${problem.description}<br>
+                                <small>Priority: ${problem.priority} | Status: ${problem.status} | ${new Date(problem.createdAt).toLocaleString()}</small>
+                            </div>
+                        `).join('');
+                } else {
+                    list.innerHTML = '<p>No problems reported yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading problems:', error);
+            }
+        }
+
+        function showPreferenceForm() {
+            const key = prompt('Enter preference key (e.g., "appointmentTime", "favoriteColor"):');
+            if (!key) return;
+
+            const value = prompt('Enter preference value:');
+            if (!value) return;
+
+            savePreference({ [key]: value }).then(() => {
+                loadPreferences();
+            });
+        }
+    </script>
+</body>
+</html>

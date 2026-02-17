@@ -1,0 +1,26 @@
+{
+  "name": "ai-receptionist-app",
+  "version": "1.0.0",
+  "description": "AI Receptionist is a web-based virtual assistant that handles customer interactions and appointment bookings using AI-driven conversation.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Caresbin-45/ai-receptionist-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Caresbin-45/ai-receptionist-app/issues"
+  },
+  "homepage": "https://github.com/Caresbin-45/ai-receptionist-app#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1"
+  }
+}
